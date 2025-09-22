@@ -1,75 +1,35 @@
-# OpenFrame Overview
+## Project Proposal: A Reconfigurable ALU for Approximate Computing
 
-The OpenFrame Project provides an empty harness chip that differs significantly from the Caravel and Caravan designs. Unlike Caravel and Caravan, which include integrated SoCs and additional features, OpenFrame offers only the essential padframe, providing users with a clean slate for their custom designs.
+### 1\. Introduction
 
-<img width="256" alt="Screenshot 2024-06-24 at 12 53 39 PM" src="https://github.com/efabless/openframe_timer_example/assets/67271180/ff58b58b-b9c8-4d5e-b9bc-bf344355fa80">
+This project proposes the design and implementation of a reconfigurable Arithmetic Logic Unit (ALU) capable of performing calculations with varying levels of precision. The ALU will be integrated into the **Microwatt** softcore, a minimal, dual-issue, in-order PowerPC ISA. The primary goal is to demonstrate the principles of **approximate computing** by enabling the ALU to switch between four distinct modes of operation: exact, approximate, moderately approximate, and very approximate. This will allow for dynamic trade-offs between computational accuracy, performance, and power consumption.
 
-## Key Characteristics of OpenFrame
+-----
 
-1. **Minimalist Design:** 
-   - No integrated SoC or additional circuitry.
-   - Only includes the padframe, a power-on-reset circuit, and a digital ROM containing the 32-bit project ID.
+### 2\. Problem Statement
 
-2. **Padframe Compatibility:**
-   - The padframe design and pin placements match those of the Caravel and Caravan chips, ensuring compatibility and ease of transition between designs.
-   - Pin types are identical, with power and ground pins positioned similarly and the same power domains available.
+Modern computing, especially in areas like machine learning, signal processing, and computer graphics, often involves computations where some loss of precision is acceptable. Traditional ALUs are designed for maximum accuracy, which can be computationally expensive and power-intensive. By developing an ALU with selectable precision, we can address this inefficiency, providing a more versatile and energy-efficient solution for applications that can tolerate a degree of error. This project seeks to build a functional prototype that proves the viability and benefits of this approach.
 
-3. **Flexibility:**
-   - Provides full access to all GPIO controls.
-   - Maximizes the user project area, allowing for greater customization and integration of alternative SoCs or user-specific projects at the same hierarchy level.
+-----
 
-4. **Simplified I/O:**
-   - Pins that previously connected to CPU functions (e.g., flash controller interface, SPI interface, UART) are now repurposed as general-purpose I/O, offering flexibility for various applications.
+### 3\. Proposed Solution
 
-The OpenFrame harness is ideal for those looking to implement custom SoCs or integrate user projects without the constraints of an existing SoC.
+The solution involves a multi-pronged approach:
 
-## Features
+  * **Hardware Design:** The core of the project is the design of the reconfigurable ALU in a Hardware Description Language (HDL), likely Verilog. The design will include logic for standard operations (addition, subtraction, multiplication, etc.) but will also incorporate dedicated circuitry to perform the various levels of approximation. Control signals will be used to select the desired mode of operation.
 
-1. 44 configurable GPIOs.
-2. User area of approximately 15mm².
-3. Supports digital, analog, or mixed-signal designs.
+  * **Microwatt Integration:** The newly designed ALU will replace the standard ALU within the Microwatt softcore. This integration will involve modifying the Microwatt's datapath and control unit to interface with the reconfigurable ALU and its control signals.
 
-# openframe_timer_example
+  * **Approximation Techniques:** Different approximation techniques will be explored and implemented for various arithmetic operations. For example, approximate adders could be implemented using techniques like truncated adders, where less significant bits are simply ignored, or error-tolerant adders that use simplified carry propagation. Similarly, approximate multipliers could use truncated Booth's algorithm or simplified partial product summation.
 
-This example implements a simple timer and connects it to the GPIOs.
+  * **Validation and Analysis:** The project will include a comprehensive verification plan. Testbenches will be developed to validate the functionality of each precision mode. We will measure and analyze key performance metrics such as power consumption, latency (performance), and error rate for each mode to quantify the trade-offs.
 
-## Installation and Setup
+-----
 
-First, clone the repository:
+### 4\. Expected Outcomes
 
-```bash
-git clone https://github.com/efabless/openframe_timer_example.git
-cd openframe_timer_example
-```
-
-Then, download all dependencies:
-
-```bash
-make setup
-```
-
-## Hardening the Design
-
-In this example, we will harden the timer. You will need to harden your own design similarly.
-
-```bash
-make user_proj_timer
-```
-
-Once you have hardened your design, integrate it into the OpenFrame wrapper:
-
-```bash
-make openframe_project_wrapper
-```
-
-## Important Notes
-
-1. **Connecting to Power:**
-   - Ensure your design is connected to power using the power pins on the wrapper.
-   - Use the `vccd1_connection` and `vssd1_connection` macros, which contain the necessary vias and nets for power connections.
-
-2. **Flattening the Design:**
-   - If you plan to flatten your design within the `openframe_project_wrapper`, do not buffer the analog pins using standard cells.
-
-3. **Running Custom Steps:**
-   - Execute the custom step in OpenLane that copies the power pins from the template DEF. If this step is skipped, the precheck will fail, and your design will not be powered.
+  * A functional, open-source GitHub repository containing the Verilog source code for a reconfigurable ALU.
+  * Demonstration of the ALU's integration into the Microwatt PowerPC softcore.
+  * Quantitative analysis of the power, performance, and accuracy trade-offs for each of the four precision modes.
+  * A clear and well-documented project that serves as a valuable resource for students and researchers in hardware design and approximate computing.
+  * A working example that showcases the practical application of approximate computing principles at the hardware level.
